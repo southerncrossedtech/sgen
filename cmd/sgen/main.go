@@ -29,7 +29,7 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	// Set up the cobra root command
-	var rootCmd = &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:   "sgen [flags]",
 		Short: "SDK from Swagger Generator.",
 		Long: "sgen generates a golang client sdk based on the swagger file input for use as an importable package.\n" +
