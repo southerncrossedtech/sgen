@@ -49,21 +49,11 @@ func main() {
 	viper.AutomaticEnv()
 
 	if err := rootCmd.Execute(); err != nil {
-		if e, ok := err.(commandFailure); ok {
-			fmt.Printf("Error: %v\n\n", string(e))
-			rootCmd.Help()
-		} else {
-			fmt.Printf("Error: %+v\n", err)
-		}
+		fmt.Printf("Error: %v\n\n", err)
+		rootCmd.Help()
 
 		os.Exit(1)
 	}
-}
-
-type commandFailure string
-
-func (c commandFailure) Error() string {
-	return string(c)
 }
 
 func run(cmd *cobra.Command, args []string) error {
