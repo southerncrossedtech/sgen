@@ -28,6 +28,9 @@ func main() {
 	// Setup zerolog logger to stdout
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
+	// Setup global log level
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+
 	// Set up the cobra root command
 	rootCmd := &cobra.Command{
 		Use:   "sgen [flags]",
@@ -49,8 +52,8 @@ func main() {
 	viper.AutomaticEnv()
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Printf("Error: %v\n\n", err)
-		rootCmd.Help()
+		fmt.Printf("Error: %v\n\n", err.Error())
+		// rootCmd.Help()
 
 		os.Exit(1)
 	}
@@ -71,9 +74,27 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	log.Info().Str("file", conf.File).Msg("running sgen")
+	log.Debug().Interface("cmdConfig", conf).Msg("using sgen with config")
 
 	if conf.DebugEnabled {
-		log.Debug().Interface("cmdConfig", conf).Msg("using sgen with config")
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+
+	// Set path for config to current directory
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	viper.AddConfigPath(currentDir)
+	viper.SetConfigName(conf.File) // Set file path in current directory
+	viper.SetConfigType("yaml")
+
+	err = viper.ReadInConfig() // Find and read the config file
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("failed to read in swagger file")
+
+		return err
 	}
 
 	return nil
