@@ -10,8 +10,5 @@ import "net/http"
 // @Success 204 "No Content"
 // @Router /example [get]
 func Get(w http.ResponseWriter, r *http.Request) {
-
 	w.WriteHeader(http.StatusNoContent)
-
-	// _ = json.NewEncoder(w).Encode(payload)
 }
