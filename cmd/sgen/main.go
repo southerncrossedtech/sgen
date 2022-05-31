@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"text/template"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -11,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/southerncrossedtech/sgen/pkg/config"
+	"github.com/southerncrossedtech/sgen/resources"
 )
 
 const sgenVersion = "0.0.1"
@@ -27,6 +29,9 @@ func main() {
 
 	// Setup zerolog logger to stdout
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
+	// Setup global log level
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	// Set up the cobra root command
 	rootCmd := &cobra.Command{
@@ -49,8 +54,8 @@ func main() {
 	viper.AutomaticEnv()
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Printf("Error: %v\n\n", err)
-		rootCmd.Help()
+		fmt.Printf("Error: %v\n\n", err.Error())
+		// rootCmd.Help()
 
 		os.Exit(1)
 	}
@@ -71,10 +76,68 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	log.Info().Str("file", conf.File).Msg("running sgen")
+	log.Debug().Interface("cmdConfig", conf).Msg("using sgen with config")
 
 	if conf.DebugEnabled {
-		log.Debug().Interface("cmdConfig", conf).Msg("using sgen with config")
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+
+	// Set path for config to current directory
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	viper.AddConfigPath(currentDir)
+	viper.SetConfigName(conf.File) // Set file path in current directory
+	viper.SetConfigType("yaml")
+
+	err = viper.ReadInConfig() // Find and read the config file
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("failed to read in swagger file")
+
+		return err
+	}
+
+	clientTplData := TemplateData{
+		Title:   strings.ToLower(viper.GetString("info.title")),
+		Version: viper.GetString("info.version"),
+	}
+
+	log.Debug().Interface("tData", clientTplData).Msg("")
+
+	clientBytes, err := resources.Templates.ReadFile("templates/00_client.go.tpl")
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("read template failed")
+
+		return err
+	}
+
+	clientTpl, err := template.New("client").Parse(string(clientBytes))
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("parse template failed")
+
+		return err
+	}
+
+	outputFile, err := os.Create(fmt.Sprintf("%s/%s/%s", currentDir, "output", "client.go"))
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("failed to create output file")
+
+		return err
+	}
+
+	err = clientTpl.Execute(outputFile, clientTplData)
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("execute template failed")
+
+		return err
 	}
 
 	return nil
+}
+
+type TemplateData struct {
+	Title   string
+	Version string
 }

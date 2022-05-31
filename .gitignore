@@ -1,2 +1,6 @@
+client/
 output/
 dist/
+docs/
+
+.vscode/
