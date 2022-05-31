@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"text/template"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -11,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/southerncrossedtech/sgen/pkg/config"
+	"github.com/southerncrossedtech/sgen/resources"
 )
 
 const sgenVersion = "0.0.1"
@@ -97,5 +99,45 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	clientTplData := TemplateData{
+		Title:   strings.ToLower(viper.GetString("info.title")),
+		Version: viper.GetString("info.version"),
+	}
+
+	log.Debug().Interface("tData", clientTplData).Msg("")
+
+	clientBytes, err := resources.Templates.ReadFile("templates/00_client.go.tpl")
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("read template failed")
+
+		return err
+	}
+
+	clientTpl, err := template.New("client").Parse(string(clientBytes))
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("parse template failed")
+
+		return err
+	}
+
+	outputFile, err := os.Create(fmt.Sprintf("%s/%s/%s", currentDir, "output", "client.go"))
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("failed to create output file")
+
+		return err
+	}
+
+	err = clientTpl.Execute(outputFile, clientTplData)
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("execute template failed")
+
+		return err
+	}
+
 	return nil
+}
+
+type TemplateData struct {
+	Title   string
+	Version string
 }
