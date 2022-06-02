@@ -1,0 +1,51 @@
+basePath: /
+definitions:
+  api.GetResponse:
+    properties:
+      headers:
+        properties:
+          accept:
+            type: string
+          acceptEncoding:
+            type: string
+          acceptLanguage:
+            type: string
+          dnt:
+            type: integer
+          host:
+            type: string
+          referer:
+            type: string
+          userAgent:
+            type: string
+        type: object
+      url:
+        type: string
+    type: object
+host: https://httpbin.org
+info:
+  contact: {}
+  description: A simple HTTP Request & Response Service.
+  license:
+    name: ISC License
+    url: https://github.com/postmanlabs/httpbin/blob/master/LICENSE
+  title: httpbin
+  version: v1.0
+paths:
+  /get:
+    get:
+      consumes:
+      - application/json
+      description: Runs a request against the httpbin.org api
+      operationId: httpbin-get
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/api.GetResponse'
+      summary: httpbin get request
+schemes:
+- https
+swagger: "2.0"
