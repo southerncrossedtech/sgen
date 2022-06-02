@@ -100,8 +100,9 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	clientTplData := TemplateData{
-		Title:   strings.ToLower(viper.GetString("info.title")),
-		Version: viper.GetString("info.version"),
+		Title:       strings.ToLower(viper.GetString("info.title")),
+		Version:     viper.GetString("info.version"),
+		SGenVersion: sgenVersion,
 	}
 
 	log.Debug().Interface("tData", clientTplData).Msg("")
@@ -134,10 +135,13 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	log.Info().Msg("sgen completed")
+
 	return nil
 }
 
 type TemplateData struct {
-	Title   string
-	Version string
+	Title       string
+	Version     string
+	SGenVersion string
 }
