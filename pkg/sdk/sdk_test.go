@@ -1,10 +1,11 @@
 package sdk
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
-	"github.com/spf13/viper"
+	"github.com/go-openapi/loads"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,17 +16,13 @@ func Test_New(t *testing.T) {
 	currentDir, err := os.Getwd()
 	require.NoError(t, err)
 
-	viper.AddConfigPath(currentDir)              // Set current directory
-	viper.SetConfigName("testdata/swagger.yaml") // Set file path in current directory
-	viper.SetConfigType("yaml")                  // Set file type
-
-	// Find and read the config file
-	err = viper.ReadInConfig()
+	specDoc, err := loads.Spec(fmt.Sprintf("%s/%s", currentDir, "testdata/swagger.yaml"))
 	require.NoError(t, err)
 
-	client := New(viper.GetViper(), currentDir, testVersion)
+	client, err := New(specDoc, currentDir, testVersion)
+	require.NoError(t, err)
 
-	require.Equal(t, "httpbin", client.Metadata.Title)
-	require.Equal(t, "v1.0", client.Metadata.Version)
-	require.Equal(t, testVersion, client.Metadata.SGenVersion)
+	require.Equal(t, "httpbin", client.Spec.Info.Title)
+	require.Equal(t, "v1.0", client.Spec.Info.Version)
+	require.Equal(t, testVersion, client.SGen.Version)
 }

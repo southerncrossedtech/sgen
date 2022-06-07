@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/go-openapi/loads"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -98,8 +99,21 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	// Load the spec into the open api spec document model
+	specDoc, err := loads.Spec(fmt.Sprintf("%s/%s", currentDir, conf.File))
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("error loading spec doc")
+
+		return err
+	}
+
 	// Get the instance of a new sdk generator
-	clientSDK := sdk.New(viper.GetViper(), currentDir, sgenVersion)
+	clientSDK, err := sdk.New(specDoc, currentDir, sgenVersion)
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("new sdk error")
+
+		return err
+	}
 
 	// Render the api client sdk using the viper loaded swagger file as config
 	err = clientSDK.Render()

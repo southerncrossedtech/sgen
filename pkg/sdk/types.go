@@ -1,17 +1,6 @@
 package sdk
 
-// Metadata contains the global details for a typical client sdk
-type Metadata struct {
-	// SGenVersion is the version of the sdk generator library.
-	SGenVersion string
-	// Title contains the lowercase title for your sdk service. This is
-	// typically what you would call your API.
-	// Swagger destination: info.title
-	Title string
-	// Version contains the version number of your API.
-	// Swagger destination: info.version
-	Version string
-}
+import "github.com/go-openapi/spec"
 
 type ClientSDK struct {
 	// CurrentDir sets the path for sgen to run in. Defaults to the
@@ -23,5 +12,12 @@ type ClientSDK struct {
 }
 
 type TemplateData struct {
-	Metadata
+	SGen
+	Spec *spec.Swagger
+}
+
+// Metadata contains the global details for a typical client sdk
+type SGen struct {
+	// SGenVersion is the version of the sdk generator library.
+	Version string
 }
