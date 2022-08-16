@@ -6,7 +6,7 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/southerncrossedtech/sgen/cmd/sgen/sdk"
+	"github.com/southerncrossedtech/sgen/cmd/sdk"
 	"github.com/spf13/cobra"
 )
 
