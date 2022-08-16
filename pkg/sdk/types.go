@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/go-openapi/spec"
-	"github.com/k0kubun/pp/v3"
 )
 
 type ClientSDK struct {
@@ -62,8 +61,6 @@ func mapOperations(specDoc *spec.Swagger) map[string][]Operation {
 			}
 		}
 	}
-
-	pp.Println(operations)
 
 	return operations
 }
