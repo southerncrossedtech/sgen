@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"text/template"
 
+	"github.com/go-openapi/loads"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/southerncrossedtech/sgen/pkg/config"
-	"github.com/southerncrossedtech/sgen/resources"
+	"github.com/southerncrossedtech/sgen/pkg/sdk"
 )
 
 const sgenVersion = "0.0.1"
@@ -55,7 +55,6 @@ func main() {
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Printf("Error: %v\n\n", err.Error())
-		// rootCmd.Help()
 
 		os.Exit(1)
 	}
@@ -88,49 +87,38 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	viper.AddConfigPath(currentDir)
-	viper.SetConfigName(conf.File) // Set file path in current directory
-	viper.SetConfigType("yaml")
+	viper.AddConfigPath(currentDir) // Set current directory
+	viper.SetConfigName(conf.File)  // Set file path in current directory
+	viper.SetConfigType("yaml")     // Set file type
 
-	err = viper.ReadInConfig() // Find and read the config file
+	// Find and read the config file
+	err = viper.ReadInConfig()
 	if err != nil {
 		log.Error().AnErr("error", err).Msg("failed to read in swagger file")
 
 		return err
 	}
 
-	clientTplData := TemplateData{
-		Title:       strings.ToLower(viper.GetString("info.title")),
-		Version:     viper.GetString("info.version"),
-		SGenVersion: sgenVersion,
-	}
-
-	log.Debug().Interface("tData", clientTplData).Msg("")
-
-	clientBytes, err := resources.Templates.ReadFile("templates/00_client.go.tpl")
+	// Load the spec into the open api spec document model
+	specDoc, err := loads.Spec(fmt.Sprintf("%s/%s", currentDir, conf.File))
 	if err != nil {
-		log.Error().AnErr("error", err).Msg("read template failed")
+		log.Error().AnErr("error", err).Msg("error loading spec doc")
 
 		return err
 	}
 
-	clientTpl, err := template.New("client").Parse(string(clientBytes))
+	// Get the instance of a new sdk generator
+	clientSDK, err := sdk.New(specDoc, currentDir, sgenVersion)
 	if err != nil {
-		log.Error().AnErr("error", err).Msg("parse template failed")
+		log.Error().AnErr("error", err).Msg("new sdk error")
 
 		return err
 	}
 
-	outputFile, err := os.Create(fmt.Sprintf("%s/%s/%s", currentDir, "output", "client.go"))
+	// Render the api client sdk using the viper loaded swagger file as config
+	err = clientSDK.Render()
 	if err != nil {
-		log.Error().AnErr("error", err).Msg("failed to create output file")
-
-		return err
-	}
-
-	err = clientTpl.Execute(outputFile, clientTplData)
-	if err != nil {
-		log.Error().AnErr("error", err).Msg("execute template failed")
+		log.Error().AnErr("error", err).Msg("render client sdk error")
 
 		return err
 	}
@@ -138,10 +126,4 @@ func run(cmd *cobra.Command, args []string) error {
 	log.Info().Msg("sgen completed")
 
 	return nil
-}
-
-type TemplateData struct {
-	Title       string
-	Version     string
-	SGenVersion string
 }

@@ -19,9 +19,9 @@ import (
 // @license.url https://github.com/postmanlabs/httpbin/blob/master/LICENSE
 func main() {
 	http.HandleFunc("/get", api.Get)
-	// http.HandleFunc("/put", api.Put)
-	// http.HandleFunc("/post", api.Post)
-	// http.HandleFunc("/delete", api.Delete)
+	http.HandleFunc("/post", api.Post)
+	http.HandleFunc("/put", api.Put)
+	http.HandleFunc("/delete", api.Delete)
 
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8085", nil)
 }
