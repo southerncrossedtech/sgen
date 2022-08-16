@@ -27,7 +27,7 @@ func (c *ClientSDK) RenderClient() error {
 		return fmt.Errorf("parse template failed: %w", err)
 	}
 
-	outputFile, err := os.Create(fmt.Sprintf("%s/%s/%s", c.CurrentDir, "output", "client.go"))
+	outputFile, err := os.Create(fmt.Sprintf("%s/%s/%s", c.CurrentDir, c.SGen.OutputPath, "client.go"))
 	if err != nil {
 		log.Error().AnErr("error", err).Msg("failed to create output file")
 

@@ -24,6 +24,8 @@ type TemplateData struct {
 
 // Metadata contains the global details for a typical client sdk
 type SGen struct {
+	// The output path, defined by the -o flag, where the sdk will render
+	OutputPath string
 	// SGenVersion is the version of the sdk generator library.
 	Version string
 }

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/go-openapi/loads"
+	"github.com/southerncrossedtech/sgen/pkg/config"
 	"github.com/stretchr/testify/require"
 )
 
@@ -19,7 +20,12 @@ func Test_New(t *testing.T) {
 	specDoc, err := loads.Spec(fmt.Sprintf("%s/%s", currentDir, "testdata/swagger.yaml"))
 	require.NoError(t, err)
 
-	client, err := New(specDoc, currentDir, testVersion)
+	conf := config.Config{
+		Output:  "output",
+		Version: testVersion,
+	}
+
+	client, err := New(specDoc, currentDir, conf)
 	require.NoError(t, err)
 
 	require.Equal(t, "httpbin", client.Spec.Info.Title)

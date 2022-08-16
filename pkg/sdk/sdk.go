@@ -5,14 +5,16 @@ import (
 
 	"github.com/go-openapi/loads"
 	"github.com/rs/zerolog/log"
+	"github.com/southerncrossedtech/sgen/pkg/config"
 )
 
 // New sets up and returns an instance of the SDK generator
-func New(specDoc *loads.Document, currentDir, sgenVersion string) (*ClientSDK, error) {
+func New(specDoc *loads.Document, currentDir string, conf config.Config) (*ClientSDK, error) {
 	// Setup the initial template data from the swagger file
 	td := TemplateData{
 		SGen: SGen{
-			Version: sgenVersion,
+			OutputPath: conf.Output,
+			Version:    conf.Version,
 		},
 		Spec:       specDoc.OrigSpec(),
 		Operations: mapOperations(specDoc.OrigSpec()),

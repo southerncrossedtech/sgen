@@ -1,25 +1,97 @@
 basePath: /
 definitions:
+  api.DeleteRequest:
+    properties:
+      key:
+        type: string
+    type: object
+  api.DeleteResponse:
+    properties:
+      accept:
+        type: string
+      accept-encoding:
+        type: string
+      accept-language:
+        type: string
+      data: {}
+      dnt:
+        type: string
+      host:
+        type: string
+      referer:
+        type: string
+      url:
+        type: string
+      user-agent:
+        type: string
+    type: object
   api.GetResponse:
     properties:
-      headers:
-        properties:
-          accept:
-            type: string
-          acceptEncoding:
-            type: string
-          acceptLanguage:
-            type: string
-          dnt:
-            type: integer
-          host:
-            type: string
-          referer:
-            type: string
-          userAgent:
-            type: string
-        type: object
+      accept:
+        type: string
+      accept-encoding:
+        type: string
+      accept-language:
+        type: string
+      dnt:
+        type: string
+      host:
+        type: string
+      referer:
+        type: string
       url:
+        type: string
+      user-agent:
+        type: string
+    type: object
+  api.PostRequest:
+    properties:
+      key:
+        type: string
+    type: object
+  api.PostResponse:
+    properties:
+      accept:
+        type: string
+      accept-encoding:
+        type: string
+      accept-language:
+        type: string
+      data: {}
+      dnt:
+        type: string
+      host:
+        type: string
+      referer:
+        type: string
+      url:
+        type: string
+      user-agent:
+        type: string
+    type: object
+  api.PutRequest:
+    properties:
+      key:
+        type: string
+    type: object
+  api.PutResponse:
+    properties:
+      accept:
+        type: string
+      accept-encoding:
+        type: string
+      accept-language:
+        type: string
+      data: {}
+      dnt:
+        type: string
+      host:
+        type: string
+      referer:
+        type: string
+      url:
+        type: string
+      user-agent:
         type: string
     type: object
 host: https://httpbin.org
@@ -32,12 +104,35 @@ info:
   title: httpbin
   version: v1.0
 paths:
+  /delete:
+    delete:
+      consumes:
+      - application/json
+      description: Runs a request against the httpbin.org api
+      operationId: http-methods-delete
+      parameters:
+      - description: request body
+        in: body
+        name: DeleteRequest
+        required: true
+        schema:
+          $ref: '#/definitions/api.DeleteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/api.DeleteResponse'
+      summary: httpbin delete request
+      tags:
+      - http-methods
   /get:
     get:
       consumes:
       - application/json
       description: Runs a request against the httpbin.org api
-      operationId: httpbin-get
+      operationId: http-methods-list
       produces:
       - application/json
       responses:
@@ -46,6 +141,54 @@ paths:
           schema:
             $ref: '#/definitions/api.GetResponse'
       summary: httpbin get request
+      tags:
+      - http-methods
+  /post:
+    post:
+      consumes:
+      - application/json
+      description: Runs a request against the httpbin.org api
+      operationId: http-methods-create
+      parameters:
+      - description: request body
+        in: body
+        name: PostRequest
+        required: true
+        schema:
+          $ref: '#/definitions/api.PostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/api.PostResponse'
+      summary: httpbin post request
+      tags:
+      - http-methods
+  /put:
+    put:
+      consumes:
+      - application/json
+      description: Runs a request against the httpbin.org api
+      operationId: http-methods-update
+      parameters:
+      - description: request body
+        in: body
+        name: PutRequest
+        required: true
+        schema:
+          $ref: '#/definitions/api.PutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/api.PutResponse'
+      summary: httpbin put request
+      tags:
+      - http-methods
 schemes:
 - https
 swagger: "2.0"
