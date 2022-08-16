@@ -11,10 +11,11 @@ import (
 func New(specDoc *loads.Document, currentDir, sgenVersion string) (*ClientSDK, error) {
 	// Setup the initial template data from the swagger file
 	td := TemplateData{
-		Spec: specDoc.OrigSpec(),
 		SGen: SGen{
 			Version: sgenVersion,
 		},
+		Spec:       specDoc.OrigSpec(),
+		Operations: mapOperations(specDoc.OrigSpec()),
 	}
 
 	return &ClientSDK{
@@ -34,6 +35,8 @@ func (c *ClientSDK) Render() error {
 
 		return fmt.Errorf("render client: %w", err)
 	}
+
+	// Render Resources from the operations
 
 	return nil
 }

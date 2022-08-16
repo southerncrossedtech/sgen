@@ -1,2 +1,1 @@
 # SDK from Swagger Generator
-
