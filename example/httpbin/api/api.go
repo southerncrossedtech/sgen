@@ -14,13 +14,15 @@ type GetResponse struct {
 }
 
 type Headers struct {
-	Accept         string `json:"accept"`
-	AcceptEncoding string `json:"accept-encoding"`
-	AcceptLanguage string `json:"accept-language"`
-	DNT            string `json:"dnt"`
-	Host           string `json:"host"`
-	Referer        string `json:"referer"`
-	UserAgent      string `json:"user-agent"`
+	XAPIVersion    string `json:"x-api-version,omitempty"`
+	Authorization  string `json:"authorization,omitempty"`
+	Accept         string `json:"accept,omitempty"`
+	AcceptEncoding string `json:"accept-encoding,omitempty"`
+	AcceptLanguage string `json:"accept-language,omitempty"`
+	DNT            string `json:"dnt,omitempty"`
+	Host           string `json:"host,omitempty"`
+	Referer        string `json:"referer,omitempty"`
+	UserAgent      string `json:"user-agent,omitempty"`
 }
 
 // Get
@@ -35,6 +37,8 @@ type Headers struct {
 func Get(w http.ResponseWriter, r *http.Request) {
 	p := GetResponse{
 		Headers: Headers{
+			Authorization:  r.Header.Get("Authorization"),
+			XAPIVersion:    r.Header.Get("X-Api-Version"),
 			Accept:         r.Header.Get("Accept"),
 			AcceptEncoding: r.Header.Get("Accept-Encoding"),
 			AcceptLanguage: r.Header.Get("Accept-Language"),
